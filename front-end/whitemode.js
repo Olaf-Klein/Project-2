@@ -1,19 +1,19 @@
-let whitemode = localStorage.get('whitemode');
-const themeswitch = document.getElementById('theme-switch');
+let whitemode = localStorage.getItem('whitemode');
+const themeSwitch = document.getElementById('theme-switch');
 
 const enableWhitemode = () => {
-    document.body.classList.add('whitemode');
-    localStorage.setitem('whitemode', 'active');
+  document.body.classList.add('whitemode');
+  localStorage.setItem('whitemode', 'active');
 };
 
 const disableWhitemode = () => {
-    document.body.classList.remove('whitemode');
-    localStorage.setitem('whitemode', null);
+  document.body.classList.remove('whitemode');
+  localStorage.setItem('whitemode', null);
 };
 
-if(whitemode === "active") enableWhitemode()
+if (whitemode === "active") enableWhitemode()
 
-themeswitch.addEventListener("click", () => {
-  whitemode = localStorage.getitem('whitemode')
+themeSwitch.addEventListener("click", () => {
+  whitemode = localStorage.getItem('whitemode')
   whitemode !== "active" ? enableWhitemode() : disableWhitemode();
 });
