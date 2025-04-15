@@ -1,32 +1,53 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
   <meta charset="UTF-8">
   <title>BitBin - TotalCode</title>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script type="text/javascript" src="whitemode.js" defer></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 2rem;
-      background-color: #1e1e1e;
-      color: #fff;
+      background-color: var(--background-color);
+      color: var(--whitetext-color);
+    }
+
+    :root {
+      --background-color: #1e1e1e;
+      --background2-color: #2d2d2d;
+      --whitetext-color: #f8f8f8;
+      --bluetext-color: #66d9ef;
+      --buttonbg1-color: #66d9ef;
+      --buttonbg-color: #ff5555;
+      --buttontext-color: #000;
+    }
+
+    .whitemode {
+      --background-color: white;
+      --background2-color: rgb(214, 204, 204);
+      --whitetext-color: black;
+      --bluetext-color: #3a53df;
+      --buttonbg1-color: #3a53df;
+      --buttonbg-color: #ff5555;
+      --buttontext-color: white;
     }
 
     h1 {
-      color: #66d9ef;
+      color: var(--bluetext-color);
     }
 
     textarea {
       width: 100%;
-      height: 300px;
+      height: 250px;
       font-family: monospace;
       font-size: 14px;
       margin-top: 1rem;
       padding: 1rem;
       border-radius: 8px;
-      background-color: #2d2d2d;
-      color: #f8f8f2;
+      background-color: var(--background2-color);
+      color: var(--whitetext-color);
       border: none;
       resize: vertical;
     }
@@ -34,8 +55,8 @@
     button {
       margin-top: 1rem;
       padding: 0.5rem 1.5rem;
-      background-color: #66d9ef;
-      color: #000;
+      background-color: var(--buttonbg1-color);
+      color: var(--buttontext-color);
       font-weight: bold;
       border: none;
       border-radius: 5px;
@@ -43,74 +64,82 @@
     }
 
     button.reset {
-      background-color: #ff5555;
+      background-color: var(--buttonbg-color);
       margin-left: 1rem;
     }
 
     pre {
       padding: 1rem;
-      background-color: #2d2d2d;
+      background-color: var(--background2-color);
       border-radius: 8px;
       overflow-x: auto;
       margin-top: 2rem;
     }
   </style>
 </head>
+
 <body>
 
-<h1>BitBin - Share code with style ✨</h1>
+  <h1>BitBin - Share code with style ✨</h1>
 
-<textarea id="codeInput" placeholder="Paste your code here..."></textarea>
-<br>
-<button onclick="highlightCode()">Show with highlighting</button>
-<button class="reset" onclick="resetCode()">Reset</button>
+  <textarea id="codeInput" placeholder="Put your code here..."></textarea>
+  <br>
+  <button onclick="highlightCode()">Show with highlighting</button>
+  <button class="reset" onclick="resetCode()">Reset</button>
+  <button id="theme-switch">Theme</button>
 
-<h2>Result:</h2>
-<pre id="outputCode"><code class="hljs"></code></pre>
+  <!-- code output with highlighting -->
+  <h2>Result:</h2>
+  <pre id="outputCode"><code class="hljs"></code></pre>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+  <!-- link output based on code input -->
+  <h2>Link:</h2>
+  <pre id="outputLink"><code class="hljs"></code></pre>
 
-<script>
-  // Check if code is stored in localStorage when the page loads
-  window.onload = function() {
-    const savedCode = localStorage.getItem('savedCode');
-    if (savedCode) {
-      document.getElementById('codeInput').value = savedCode;
-      highlightCode(); // Highlight the code if it comes from localStorage
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+
+  <script>
+    // Check if code is stored in localStorage when the page loads
+    window.onload = function () {
+      const savedCode = localStorage.getItem('savedCode');
+      if (savedCode) {
+        document.getElementById('codeInput').value = savedCode;
+        highlightCode(); // Highlight the code if it comes from localStorage
+      }
+    };
+
+    function highlightCode() {
+      const code = document.getElementById('codeInput').value;
+      const output = document.getElementById('outputCode');
+
+      // Create a new code element
+      const newCode = document.createElement('code');
+      newCode.textContent = code;
+      newCode.className = 'hljs'; // Apply Highlight.js style
+
+      // Append the new code block to <pre>
+      output.innerHTML = ''; // Clear previous content
+      output.appendChild(newCode);
+
+      // Let Highlight.js automatically detect the language
+      hljs.highlightElement(newCode);
+
+      // Save the code to localStorage
+      localStorage.setItem('savedCode', code);
     }
-  };
 
-  function highlightCode() {
-    const code = document.getElementById('codeInput').value;
-    const output = document.getElementById('outputCode');
-
-    // Create a new code element
-    const newCode = document.createElement('code');
-    newCode.textContent = code;
-    newCode.className = 'hljs'; // Apply Highlight.js style
-
-    // Append the new code block to <pre>
-    output.innerHTML = ''; // Clear previous content
-    output.appendChild(newCode);
-
-    // Let Highlight.js automatically detect the language
-    hljs.highlightElement(newCode);
-
-    // Save the code to localStorage
-    localStorage.setItem('savedCode', code);
-  }
-
-  // Reset the textarea and remove the code from localStorage
-  function resetCode() {
-    document.getElementById('codeInput').value = '';
-    document.getElementById('outputCode').innerHTML = '<code class="hljs"></code>';
-    localStorage.removeItem('savedCode'); // Remove code from localStorage
-  }
-</script>
+    // Reset the textarea and remove the code from localStorage
+    function resetCode() {
+      document.getElementById('codeInput').value = '';
+      document.getElementById('outputCode').innerHTML = '<code class="hljs"></code>';
+      localStorage.removeItem('savedCode'); // Remove code from localStorage
+    }
+  </script>
 
 </body>
+
 </html>
