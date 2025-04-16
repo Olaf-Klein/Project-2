@@ -23,14 +23,16 @@ function generateLink() {
 
     // Send an AJAX request to the PHP script
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'save_text.php', true);
+    xhr.open('POST', 'DB_Connection.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.send(`slug=${slug}&text=${text}`);
-
-    // Create a new element under the share button
-    const linkElement = document.createElement("p");
-    linkElement.textContent = `Link: ${link}`;
-    sharebutton.parentNode.appendChild(linkElement);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Update the <pre> element with the generated link
+            const outputLink = document.getElementById("outputLink");
+            outputLink.textContent = `Generated Link: ${link}`;
+        }
+    };
+    xhr.send(`slug=${slug}&text=${encodeURIComponent(text)}`);
 }
 
 // Add an event listener to the share button if it exists
