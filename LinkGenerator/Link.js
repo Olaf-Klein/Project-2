@@ -16,20 +16,21 @@ function generateSlug(length = 16) {
 function generateLink() {
     const slug = generateSlug();
     const link = `http://pastebin-knockoff.42web.io/${slug}`;
-    console.log(link);
 
     // Get the text from the input field
     const text = codeInput.value;
 
     // Send an AJAX request to the PHP script
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'DB_Connection.php', true);
+    xhr.open('POST', '/Database/DB_Connection.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             // Update the <pre> element with the generated link
             const outputLink = document.getElementById("outputLink");
             outputLink.textContent = `Generated Link: ${link}`;
+        } else if (xhr.readyState === 4) {
+            console.error("Failed to save the code or generate the link.");
         }
     };
     xhr.send(`slug=${slug}&text=${encodeURIComponent(text)}`);

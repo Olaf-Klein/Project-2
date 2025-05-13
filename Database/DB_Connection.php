@@ -30,7 +30,7 @@
   // Insert the code into the html_texts table
   $sql = "INSERT INTO html_texts (random_links_id, html_text) VALUES ('$link_id', '$text')";
   if ($conn->query($sql) === TRUE) {
-    echo "Text saved successfully!";
+    echo "Link and text saved successfully!";
   } else {
     echo "Error saving code: " . $conn->error;
   }
