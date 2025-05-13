@@ -37,12 +37,11 @@ function generateLink() {
 }
 
 // Add an event listener to the share button if it exists
-function Checklink() {
-
-if (sharebutton) {
-    sharebutton.addEventListener("click", generateLink);
-} else {
-    console.error("De sharebutton met de id 'sharebutton' bestaat niet.");
-}
+function checkLink() {
+    if (sharebutton) {
+        sharebutton.addEventListener("click", generateLink);
+    } else {
+        console.error("De sharebutton met de id 'sharebutton' bestaat niet.");
+    }
 }
 // Call the function to check if the share button exists
