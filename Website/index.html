@@ -3,10 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>BitBin - TotalCode</title>
+  <title>BitBin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script type="text/javascript" src="whitemode.js" defer></script>
-  <script type="javascript" src="Link.js" defer></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -40,7 +39,7 @@
     }
 
     textarea {
-      width: 100%;
+      width: 98%;
       height: 250px;
       font-family: monospace;
       font-size: 14px;
@@ -50,7 +49,7 @@
       background-color: var(--background2-color);
       color: var(--whitetext-color);
       border: none;
-      resize: vertical;
+      /* resize: vertical; */
     }
 
     button {
@@ -75,6 +74,20 @@
       border-radius: 8px;
       overflow-x: auto;
       margin-top: 2rem;
+      position: relative;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 2px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: none;
+      background: var(--buttonbg1-color);
+      color: var(--buttontext-color);
+      cursor: pointer;
     }
   </style>
 </head>
@@ -92,12 +105,20 @@
   <!-- code output with highlighting -->
   <h2>Result:</h2>
   <pre id="outputCode"><code class="hljs"></code></pre>
+  <button id="copyOutputCode" style="margin-bottom:1rem;">Copy Result</button>
   <br>
-  <button id="shareButton" onclick="checkLink()">Share</button>
+  <button id="shareButton" onclick="generateLink()">Share</button>
 
   <!-- link output based on code input -->
-  <h2>Link:</h2>
+  <h2>Slug:</h2>
   <pre id="outputLink"><code class="hljs"></code></pre>
+  <button id="copyOutputLink">Copy Slug</button>
+
+  <!-- Retrieve code by slug -->
+  <h2>Retrieve Code by Slug</h2>
+  <input type="text" id="slugInput" placeholder="Enter slug here..." style="width: 250px; margin-right: 1rem;">
+  <button id="retrieveCodeBtn">Retrieve Code</button>
+  <pre id="retrievedCode"><code class="hljs"></code></pre>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
@@ -106,6 +127,114 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
 
   <script>
+    // Get the share button from the DOM
+    const sharebutton = document.getElementById("sharebutton");
+    const codeInput = document.getElementById("codeInput");
+
+    // Function to generate a random slug
+    function generateSlug(length = 16) {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let slug = '';
+      for (let i = 0; i < length; i++) {
+        slug += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return slug;
+    }
+
+    // Function to generate a new link and log it to the console
+    function generateLink() {
+      const slug = generateSlug();
+      const link = `${slug}`;
+
+      // Show the generated link immediately
+      const outputLink = document.getElementById("outputLink");
+      outputLink.innerHTML = `${link}`;
+
+      // Get the text from the input field
+      const text = codeInput.value;
+
+      // Use fetch to the correct PHP file
+      fetch('/Projecten/Project-2 Pastebin knockoff/DB_Connection.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `slug=${slug}&text=${encodeURIComponent(text)}`
+      })
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.text();
+        })
+        .then(data => {
+          // Optionally handle the response
+          // console.log(data);
+        })
+        .catch(error => {
+          console.error("Failed to save the code or generate the link.", error);
+        });
+    }
+
+    function checkLink() {
+      sharebutton.addEventListener("click", generateLink);
+    }
+
+    // Add copy button functionality for outputCode and outputLink
+    document.addEventListener('DOMContentLoaded', function () {
+      const copyOutputCodeBtn = document.getElementById('copyOutputCode');
+      const copyOutputLinkBtn = document.getElementById('copyOutputLink');
+      const outputCode = document.getElementById('outputCode');
+      const outputLink = document.getElementById('outputLink');
+
+      if (copyOutputCodeBtn) {
+        copyOutputCodeBtn.addEventListener('click', function () {
+          const codeElem = outputCode.querySelector('code');
+          if (codeElem) {
+            navigator.clipboard.writeText(codeElem.textContent)
+              .then(() => {
+                copyOutputCodeBtn.textContent = 'Copied!';
+                setTimeout(() => copyOutputCodeBtn.textContent = 'Copy Result', 1200);
+              });
+          }
+        });
+      }
+      if (copyOutputLinkBtn) {
+        copyOutputLinkBtn.addEventListener('click', function () {
+          const linkElem = outputLink.querySelector('code');
+          let textToCopy = linkElem ? linkElem.textContent : outputLink.textContent;
+          navigator.clipboard.writeText(textToCopy.trim())
+            .then(() => {
+              copyOutputLinkBtn.textContent = 'Copied!';
+              setTimeout(() => copyOutputLinkBtn.textContent = 'Copy Link', 1200);
+            });
+        });
+      }
+      // Retrieve code by slug functionality
+      document.getElementById('retrieveCodeBtn').addEventListener('click', function () {
+        const slug = document.getElementById('slugInput').value.trim();
+        if (!slug) {
+          alert('Please enter a slug.');
+          return;
+        }
+
+        fetch('/Projecten/Project-2 Pastebin knockoff/DB_Connection.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'get_slug=' + encodeURIComponent(slug)
+        })
+          .then(response => response.text())
+          .then(data => {
+            const codeElem = document.getElementById('retrievedCode').querySelector('code');
+            codeElem.textContent = data;
+            hljs.highlightElement(codeElem);
+          })
+          .catch(err => {
+            document.getElementById('retrievedCode').textContent = 'Error retrieving code.';
+          });
+      });
+    });
+
+// ----CODE HIGHLIGHTING----
+
     // Check if code is stored in localStorage when the page loads
     window.onload = function () {
       const savedCode = localStorage.getItem('savedCode');

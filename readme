@@ -1,0 +1,46 @@
+BitBin - Pastebin Knockoff Documentation
+
+Overview
+BitBin is a simple web application for sharing code snippets or text using unique slugs (short links). Users can paste code, highlight it, generate a shareable slug, and retrieve code by entering a slug. The application supports both dark and light (white) themes.
+
+File Structure
+index.html: Main frontend page with UI, code highlighting, and all main JavaScript logic.
+DB_Connection.php: Backend PHP script for saving and retrieving code snippets from the database.
+schema.sql: SQL schema for the required MySQL tables.
+whitemode.js: Handles theme switching (dark/light mode).
+
+How It Works
+1. User Interface (index.html)
+Paste Code: Users enter code in a textarea.
+Highlight: Clicking "Show with highlighting" highlights the code using Highlight.js.
+Share: Clicking "Share" generates a random slug, saves the code to the backend, and displays the slug.
+Copy: Buttons allow copying the highlighted code or slug.
+Retrieve: Users can enter a slug to retrieve and display the associated code.
+Theme Switch: Toggle between dark and light mode.
+
+2. Backend (DB_Connection.php)
+Save Code: Receives POST requests with slug and text, saves or updates the code in the database.
+Retrieve Code: Receives POST requests with get_slug, fetches the code for the given slug.
+Database: Uses two tables:
+random_links: Stores unique slugs.
+html_texts: Stores code/text associated with each slug.
+
+3. Database Schema (schema.sql)
+random_links(id, slug)
+html_texts(id, random_links_id, html_text)
+Theme Switching (whitemode.js)
+Stores the theme preference in localStorage.
+Adds/removes the .whitemode class on the <body> to switch CSS variables.
+Notes
+
+All code and data are handled via AJAX/fetch requests; no page reloads are needed.
+Highlight.js is used for syntax highlighting.
+The application is designed for local use (paths are relative to /Projecten/Project-2 Pastebin knockoff/).
+Example Usage
+Paste code in the textarea.
+Click "Show with highlighting" to preview.
+Click "Share" to generate a slug and save the code.
+Share the slug with others.
+Anyone can retrieve the code by entering the slug and clicking "Retrieve Code".
+Authors
+See code comments for further details and customization options.

@@ -1,40 +1,104 @@
 <?php
   // Database connection settings
-  $servername = "sql210.infinityfree.com";
-  $username = "if0_38649015";
-  $password = "HdUB2Ufhpw";
-  $dbname = "if0_38649015_p2db";
-  $port = "3306";
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $port = 3306;
+  $dbname = "testproject2";
 
   // Create a new database connection
   $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
-  // Check if the connection was successful
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   }
 
-  // Get the slug and text from the AJAX request
-  $slug = $_POST['slug'];
-  $text = $_POST['text'];
+  // Save code
+  if (isset($_POST['slug']) && isset($_POST['text'])) {
+    $slug = $_POST['slug'];
+    $text = $_POST['text'];
+    
+    // Check if slug already exists
+    $stmt = $conn->prepare("SELECT id FROM random_links WHERE slug = ?");
+    $stmt->bind_param("s", $slug);
+    $stmt->execute();
+    $stmt->store_result();
 
-  // Insert the link into the random_links table
-  $sql = "INSERT INTO random_links (slug) VALUES ('$slug')";
-  if ($conn->query($sql) === TRUE) {
-    $link_id = $conn->insert_id;
-  } else {
-    echo "Error saving link: " . $conn->error;
+    if ($stmt->num_rows === 0) {
+      // Insert the slug
+      $stmt_insert = $conn->prepare("INSERT INTO random_links (slug) VALUES (?)");
+      $stmt_insert->bind_param("s", $slug);
+      if ($stmt_insert->execute()) {
+        $link_id = $stmt_insert->insert_id;
+      } else {
+        echo "Error saving link: " . $conn->error;
+        exit;
+      }
+      $stmt_insert->close();
+    } else {
+      // Slug exists, get its id
+      $stmt->bind_result($link_id);
+      $stmt->fetch();
+    }
+    $stmt->close();
+
+    // Check if code already exists for this link_id
+    $stmt_check = $conn->prepare("SELECT id FROM html_texts WHERE random_links_id = ?");
+    $stmt_check->bind_param("i", $link_id);
+    $stmt_check->execute();
+    $stmt_check->store_result();
+
+    if ($stmt_check->num_rows === 0) {
+      // Insert the code
+      $stmt_code = $conn->prepare("INSERT INTO html_texts (random_links_id, html_text) VALUES (?, ?)");
+      $stmt_code->bind_param("is", $link_id, $text);
+      if ($stmt_code->execute()) {
+        echo "Link and text saved successfully!\n";
+      } else {
+        echo "Error saving code: " . $conn->error;
+        exit;
+      }
+      $stmt_code->close();
+    } else {
+      // Update the code if it already exists
+      $stmt_update = $conn->prepare("UPDATE html_texts SET html_text = ? WHERE random_links_id = ?");
+      $stmt_update->bind_param("si", $text, $link_id);
+      if ($stmt_update->execute()) {
+        echo "Text updated successfully!\n";
+      } else {
+        echo "Error updating code: " . $conn->error;
+        exit;
+      }
+      $stmt_update->close();
+    }
+    $stmt_check->close();
+    $conn->close();
     exit;
   }
 
-  // Insert the code into the html_texts table
-  $sql = "INSERT INTO html_texts (random_links_id, html_text) VALUES ('$link_id', '$text')";
-  if ($conn->query($sql) === TRUE) {
-    echo "Link and text saved successfully!";
-  } else {
-    echo "Error saving code: " . $conn->error;
+  // Retrieve code by slug
+  if (isset($_POST['get_slug'])) {
+    $slug = $_POST['get_slug'];
+    $stmt = $conn->prepare(
+      "SELECT h.html_text 
+       FROM random_links r 
+       JOIN html_texts h ON r.id = h.random_links_id 
+       WHERE r.slug = ? 
+       LIMIT 1"
+    );
+    $stmt->bind_param("s", $slug);
+    $stmt->execute();
+    $stmt->bind_result($retrieved_text);
+    if ($stmt->fetch()) {
+      echo $retrieved_text;
+    } else {
+      echo "No code found for this slug.";
+    }
+    $stmt->close();
+    $conn->close();
+    exit;
   }
 
-  // Close the database connection
+  echo "Invalid request.";
   $conn->close();
 ?>
