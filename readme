@@ -35,7 +35,6 @@ Notes
 
 All code and data are handled via AJAX/fetch requests; no page reloads are needed.
 Highlight.js is used for syntax highlighting.
-The application is designed for local use (paths are relative to /Projecten/Project-2 Pastebin knockoff/).
 Example Usage
 Paste code in the textarea.
 Click "Show with highlighting" to preview.
