@@ -10,12 +10,12 @@
     body {
       font-family: Arial, sans-serif;
       margin: 2rem;
-      background-color: var(--background-color);
+      background: var(--background-gradient);
       color: var(--whitetext-color);
     }
 
     :root {
-      --background-color: #1e1e1e;
+      --background-gradient: radial-gradient(circle, rgba(117, 87, 100, 1) 0%, rgba(17, 46, 79, 1) 100%);
       --background2-color: #2d2d2d;
       --whitetext-color: #f8f8f8;
       --bluetext-color: #66d9ef;
@@ -25,7 +25,7 @@
     }
 
     .whitemode {
-      --background-color: white;
+      --background-gradient: radial-gradient(circle, rgba(212, 184, 197, 1) 0%, rgba(161, 188, 214, 1) 100%);
       --background2-color: rgb(214, 204, 204);
       --whitetext-color: black;
       --bluetext-color: #3a53df;
@@ -33,6 +33,15 @@
       --buttonbg-color: #ff5555;
       --buttontext-color: white;
     }
+    .whitemode pre {
+     background-color: #D6CCCC !important;
+     color: #222 !important;
+    }
+
+    .whitemode code {
+     background-color: #2D2D2D !important;
+    }
+
 
     h1 {
       color: var(--bluetext-color);
@@ -53,7 +62,6 @@
     }
 
     button {
-      margin-top: 1rem;
       padding: 0.5rem 1.5rem;
       background-color: var(--buttonbg1-color);
       color: var(--buttontext-color);
@@ -89,12 +97,18 @@
       color: var(--buttontext-color);
       cursor: pointer;
     }
+
+    .inputredeemslug {
+        display: flex;
+	align-items: Center
+    }
+
   </style>
 </head>
 
 <body>
 
-  <h1>BitBin - Share code with style ✨</h1>
+  <h1>BitBin - Share code with style</h1>
 
   <textarea id="codeInput" placeholder="Put your code here..."></textarea>
   <br>
@@ -116,9 +130,12 @@
 
   <!-- Retrieve code by slug -->
   <h2>Retrieve Code by Slug</h2>
-  <input type="text" id="slugInput" placeholder="Enter slug here..." style="width: 250px; margin-right: 1rem;">
-  <button id="retrieveCodeBtn">Retrieve Code</button>
+  <div class="inputredeemslug">
+      <textarea type="text" id="slugInput" placeholder="Enter slug here..." style="width: 250px; height: 10px; margin-right: 1rem; overflow:hidden;"></textarea>
+      <button id="retrieveCodeBtn" style="margin-top: 15px;">Retrieve Code</button>
+  </div>
   <pre id="retrievedCode"><code class="hljs"></code></pre>
+  <button id="copyRetrievedCode" style="margin-bottom: 1rem;">Copy Result</button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
@@ -154,7 +171,7 @@
       const text = codeInput.value;
 
       // Use fetch to the correct PHP file
-      fetch('/Projecten/Project-2 Pastebin knockoff/DB_Connection.php', {
+      fetch('DB_Connection.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -181,6 +198,7 @@
     // Add copy button functionality for outputCode and outputLink
     document.addEventListener('DOMContentLoaded', function () {
       const copyOutputCodeBtn = document.getElementById('copyOutputCode');
+      const copyRetrievedCodeBtn = document.getElementById('copyRetrievedCode');
       const copyOutputLinkBtn = document.getElementById('copyOutputLink');
       const outputCode = document.getElementById('outputCode');
       const outputLink = document.getElementById('outputLink');
@@ -208,6 +226,18 @@
             });
         });
       }
+      if (copyRetrievedCodeBtn) {
+        copyRetrievedCodeBtn.addEventListener('click', function () {
+          const codeElem = retrievedCode.querySelector('code');
+          if (codeElem) {
+            navigator.clipboard.writeText(codeElem.textContent)
+              .then(() => {
+                copyRetrievedCodeBtn.textContent = 'Copied!';
+                setTimeout(() => copyRetrievedCodeBtn.textContent = 'Copy Result', 1200);
+              });
+          }
+        });
+      }
       // Retrieve code by slug functionality
       document.getElementById('retrieveCodeBtn').addEventListener('click', function () {
         const slug = document.getElementById('slugInput').value.trim();
@@ -216,7 +246,7 @@
           return;
         }
 
-        fetch('/Projecten/Project-2 Pastebin knockoff/DB_Connection.php', {
+        fetch('DB_Connection.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: 'get_slug=' + encodeURIComponent(slug)
@@ -233,7 +263,7 @@
       });
     });
 
-// ----CODE HIGHLIGHTING----
+    // ----CODE HIGHLIGHTING----
 
     // Check if code is stored in localStorage when the page loads
     window.onload = function () {
