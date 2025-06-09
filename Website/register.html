@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Inloggen - BitBin</title>
+    <title>Registreren - BitBin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <script type="text/javascript" src="whitemode.js" defer></script>
@@ -68,57 +68,64 @@
     <div class="container py-5 text-light">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
-                <div class="card p-4 shadow-lg">
-                    <h1 class="mb-4 text-primary text-center">BitBin</h1>
-                    <form id="loginForm">
+                <div class="card p-4">
+                    <h2 class="mb-4 text-primary text-center">Registreren</h2>
+                    <form id="registerForm">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Gebruikersnaam"
-                                required>
+                            <input type="text" class="form-control text-light" id="username" name="username" placeholder="Gebruikersnaam" required>
                         </div>
                         <div class="mb-3">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Wachtwoord"
-                                required>
+                            <input type="email" class="form-control text-light" id="email" name="email" placeholder="E-mail" required>
                         </div>
-                        <div id="loginMsg" class="mb-2 text-center"></div>
-                        <button type="submit" class="btn btn-primary w-100">Inloggen</button>
+                        <div class="mb-3">
+                            <input type="password" class="form-control text-light" id="password" name="password" placeholder="Wachtwoord" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control text-light" id="confirmPassword" name="confirmPassword" placeholder="Bevestig wachtwoord" required>
+                        </div>
+                        <div id="registerMsg" class="mb-2 text-center nog-account-text"></div>
+                        <button type="submit" class="btn btn-primary w-100">Registreren</button>
                     </form>
                     <div class="mt-3 text-center nog-account-text">
-                        <span>Nog geen account? <a href="register.html">Registreren</a></span>
+                        <span>Heb je al een account? <a href="index.html">Inloggen</a></span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        // Login form AJAX
-        const loginForm = document.getElementById('loginForm');
-        const loginMsg = document.getElementById('loginMsg');
-        if (loginForm) {
-            loginForm.addEventListener('submit', function (e) {
+        // Register form AJAX
+        const registerForm = document.getElementById('registerForm');
+        const registerMsg = document.getElementById('registerMsg');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                loginMsg.textContent = '';
+                registerMsg.textContent = '';
                 const data = new URLSearchParams();
-                data.append('login_username', loginForm.username.value);
-                data.append('login_password', loginForm.password.value);
+                data.append('register_username', registerForm.username.value);
+                data.append('register_email', registerForm.email.value);
+                data.append('register_password', registerForm.password.value);
+                data.append('register_confirm', registerForm.confirmPassword.value);
                 fetch('DB_Connection.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: data.toString()
                 })
-                    .then(res => res.json())
-                    .then(json => {
-                        loginMsg.textContent = json.message;
-                        loginMsg.style.color = json.success ? 'green' : 'red';
-                        if (json.success) {
-                            setTimeout(() => {
-                                window.location.href = 'home.html';
-                            }, 1000);
-                        }
-                    })
-                    .catch(() => {
-                        loginMsg.textContent = 'Er is een fout opgetreden.';
-                        loginMsg.style.color = 'red';
-                    });
+                .then(res => res.json())
+                .then(json => {
+                    registerMsg.textContent = json.message;
+                    registerMsg.style.color = json.success ? 'green' : 'red';
+                    if (json.success) {
+                        registerForm.reset();
+                        setTimeout(() => {
+                            window.location.href = 'home.html';
+                        }, 1000);
+                    }
+                })
+                .catch(() => {
+                    registerMsg.textContent = 'Er is een fout opgetreden.';
+                    registerMsg.style.color = 'red';
+                });
             });
         }
     </script>

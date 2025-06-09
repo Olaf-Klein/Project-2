@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BitBin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <script type="text/javascript" src="whitemode.js" defer></script>
+    <style>
+        body {
+            background: var(--background-gradient, radial-gradient(circle, #755764 0%, #112e4f 100%));
+            color: var(--whitetext-color, #f8f8f8);
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .whitemode {
+            --background-gradient: radial-gradient(circle, #d4b8c5 0%, #a1bcd6 100%);
+            --whitetext-color: #000;
+        }
+
+        pre {
+            background-color: var(--background2-color, #2d2d2d) !important;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        code {
+            max-height: 200px;
+        }
+
+        textarea,
+        .form-control[type="text"],
+        .form-control {
+            background-color: var(--background2-color, #2d2d2d) !important;
+            color: var(--whitetext-color, #f8f8f8) !important;
+            border: none;
+            border-radius: 8px;
+        }
+
+        /* White placeholder for textarea in dark mode */
+        body:not(.whitemode) textarea::placeholder,
+        body:not(.whitemode) .form-control::placeholder {
+            color: #fff !important;
+            opacity: 1;
+        }
+
+        .whitemode pre {
+            background-color: #D6CCCC !important;
+            color: #222 !important;
+        }
+
+        .whitemode textarea,
+        .whitemode .form-control[type="text"],
+        .whitemode .form-control {
+            background-color: #D6CCCC !important;
+            color: #222 !important;
+        }
+
+        /* Default (black) placeholder for textarea in whitemode */
+        .whitemode textarea::placeholder,
+        .whitemode .form-control::placeholder {
+            color: #222 !important;
+            opacity: 1;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: none;
+            background: var(--buttonbg1-color, #66d9ef);
+            color: var(--buttontext-color, #000);
+            cursor: pointer;
+        }
+
+        .bitbin-copy-btn {
+            position: absolute;
+            left: auto;
+            right: 11px;
+            margin-top: -48px;
+            box-shadow: 0 1px 4px #0002;
+            background: rgba(34, 34, 34, 0.95);
+            border-radius: 6px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .modal-content {
+            background-color: #23272b;
+            color: #fff;
+            border-radius: 12px;
+        }
+
+        .whitemode .modal-content {
+            background-color: #fff;
+            color: #222;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+        <div class="container-fluid text-light">
+            <a class="navbar-brand text-light" href="#">BitBin</a>
+            <!-- <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form> -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse text-nowrap" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active text-light" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="history.html">History</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="true">
+                        Account
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="settings.html" id="settingsBtn">Settings</a></li>
+                        <li><a class="dropdown-item" id="theme-switch" href="#">Theme</a></li>
+                        <li><a class="dropdown-item" href="#" id="logoutBtn">Log-out</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <a href="#" class="text-light container" title="Er zijn nieuwe posts" data-bs-toggle="tooltip"
+                data-bs-placement="left">
+                <span class="bi-bell"></span>
+                <span
+                    class="position-absolute start-10 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+            </a>
+        </div>
+    </nav>
+    <div class="container py-4">
+        <h1 class="mb-4 text-primary">BitBin - Share code with style</h1>
+
+        <div class="mb-3">
+            <textarea id="codeInput" class="form-control" rows="8" placeholder="Put your code here..."></textarea>
+        </div>
+        <div class="mb-3 d-flex gap-2">
+            <button class="btn btn-primary" onclick="highlightCode()">Show with highlighting</button>
+            <button class="btn btn-danger" onclick="resetCode()">Reset</button>
+        </div>
+
+        <h2 class="mt-4">Result:</h2>
+        <div class="mb-2">
+            <div class="position-relative">
+                <pre id="outputCode" class="mb-0"><code id="scroll" class="hljs"></code></pre>
+                <button id="copyOutputCode" class="btn btn-dark btn-sm bitbin-copy-btn" title="Copy">
+                    <i class="bi bi-clipboard" style="font-size:1.2em;vertical-align:middle;"></i>
+                </button>
+            </div>
+        </div>
+        <button id="shareButton" class="btn btn-success mb-4">Share</button>
+
+        <h2>Slug:</h2>
+        <div class="mb-2">
+            <div class="position-relative">
+                <pre id="outputLink" class="mb-0"><code class="hljs"></code></pre>
+                <button id="copyOutputLink" class="btn btn-dark btn-sm bitbin-copy-btn" title="Copy">
+                    <i class="bi bi-clipboard" style="font-size:1.2em;vertical-align:middle;"></i>
+                </button>
+            </div>
+        </div>
+
+        <h2>Retrieve Code by Slug</h2>
+        <div class="input-group mb-2" style="max-width:400px;">
+            <input type="text" id="slugInput" class="form-control" placeholder="Enter slug here...">
+            <button id="retrieveCodeBtn" class="btn btn-primary">Retrieve Code</button>
+        </div>
+        <div class="mb-2">
+            <div class="position-relative">
+                <pre id="retrievedCode" class="mb-0"><code class="hljs"></code></pre>
+                <button id="copyRetrievedCode" class="btn btn-dark btn-sm bitbin-copy-btn" title="Copy">
+                    <i class="bi bi-clipboard" style="font-size:1.2em;vertical-align:middle;"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutModalLabel">Uitloggen bevestigen</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Weet je zeker dat je wilt uitloggen?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Uitloggen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+        <script>
+            // Get the share button from the DOM
+            const sharebutton = document.getElementById("sharebutton");
+            const codeInput = document.getElementById("codeInput");
+
+            // Function to generate a random slug
+
+            // Add copy button functionality for outputCode and outputLink
+            document.addEventListener('DOMContentLoaded', function () {
+                const copyOutputCodeBtn = document.getElementById('copyOutputCode');
+                const copyRetrievedCodeBtn = document.getElementById('copyRetrievedCode');
+                const copyOutputLinkBtn = document.getElementById('copyOutputLink');
+                const outputCode = document.getElementById('outputCode');
+                const outputLink = document.getElementById('outputLink');
+                const retrievedCode = document.getElementById('retrievedCode');
+
+                function generateSlug(length = 16) {
+                    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                    let slug = '';
+                    for (let i = 0; i < length; i++) {
+                        slug += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    return slug;
+                }
+
+                // Function to generate a new link and log it to the console
+                function generateLink() {
+                    const slug = generateSlug();
+                    const link = `${slug}`;
+
+                    // Show the generated link immediately
+                    const outputLink = document.getElementById("outputLink");
+                    outputLink.innerHTML = `${link}`;
+
+                    // Get the text from the input field
+                    const text = codeInput.value;
+
+                    // Use fetch to the correct PHP file
+                    fetch('DB_Connection.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `slug=${slug}&text=${encodeURIComponent(text)}`
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.text();
+                        })
+                        .then(data => {
+                            // Optionally handle the response
+                            // console.log(data);
+                        })
+                        .catch(error => {
+                            console.error("Failed to save the code or generate the link.", error);
+                        });
+                }
+
+                function checkLink() {
+                    sharebutton.addEventListener("click", generateLink);
+                }
+
+                if (copyOutputCodeBtn) {
+                    copyOutputCodeBtn.addEventListener('click', function () {
+                        const codeElem = outputCode.querySelector('code');
+                        if (codeElem) {
+                            navigator.clipboard.writeText(codeElem.textContent)
+                                .then(() => {
+                                    // Change icon to clipboard-check
+                                    copyOutputCodeBtn.innerHTML = '<i class="bi bi-clipboard-check" style="font-size:1.2em;vertical-align:middle;"></i>';
+                                    setTimeout(() => {
+                                        copyOutputCodeBtn.innerHTML = '<i class="bi bi-clipboard" style="font-size:1.2em;vertical-align:middle;"></i>';
+                                    }, 1200);
+                                });
+                        }
+                    });
+                }
+                if (copyOutputLinkBtn) {
+                    copyOutputLinkBtn.addEventListener('click', function () {
+                        const linkElem = outputLink.querySelector('code');
+                        let textToCopy = linkElem ? linkElem.textContent : outputLink.textContent;
+                        navigator.clipboard.writeText(textToCopy.trim())
+                            .then(() => {
+                                copyOutputLinkBtn.innerHTML = '<i class="bi bi-clipboard-check" style="font-size:1.2em;vertical-align:middle;"></i>';
+                                setTimeout(() => {
+                                    copyOutputLinkBtn.innerHTML = '<i class="bi bi-clipboard" style="font-size:1.2em;vertical-align:middle;"></i>';
+                                }, 1200);
+                            });
+                    });
+                }
+
+                if (copyRetrievedCodeBtn) {
+                    copyRetrievedCodeBtn.addEventListener('click', function () {
+                        const codeElem = retrievedCode.querySelector('code');
+                        if (codeElem) {
+                            navigator.clipboard.writeText(codeElem.textContent)
+                                .then(() => {
+                                    copyRetrievedCodeBtn.innerHTML = '<i class="bi bi-clipboard-check" style="font-size:1.2em;vertical-align:middle;"></i>';
+                                    setTimeout(() => {
+                                        copyRetrievedCodeBtn.innerHTML = '<i class="bi bi-clipboard" style="font-size:1.2em;vertical-align:middle;"></i>';
+                                    }, 1200);
+                                });
+                        }
+                    });
+                }
+                // Retrieve code by slug functionality
+                document.getElementById('retrieveCodeBtn').addEventListener('click', function () {
+                    const slug = document.getElementById('slugInput').value.trim();
+                    if (!slug) {
+                        alert('Please enter a slug.');
+                        return;
+                    }
+
+                    fetch('DB_Connection.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'get_slug=' + encodeURIComponent(slug)
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            const codeElem = document.getElementById('retrievedCode').querySelector('code');
+                            codeElem.textContent = data;
+                            if (typeof hljs !== 'undefined' && hljs.highlightElement) {
+                                hljs.highlightElement(codeElem);
+                            }
+                        })
+                        .catch(err => {
+                            document.getElementById('retrievedCode').querySelector('code').textContent = 'Error retrieving code.';
+                        });
+                });
+
+                // Attach generateLink to the Share button
+                document.getElementById('shareButton').addEventListener('click', generateLink);
+            });
+
+            // ----CODE HIGHLIGHTING----
+
+            // Check if code is stored in localStorage when the page loads
+            window.onload = function () {
+                const savedCode = localStorage.getItem('savedCode');
+                if (savedCode) {
+                    document.getElementById('codeInput').value = savedCode;
+                    highlightCode(); // Highlight the code if it comes from localStorage
+                }
+            };
+
+            function highlightCode() {
+                const code = document.getElementById('codeInput').value;
+                const output = document.getElementById('outputCode');
+                // Remove all children and create a new code element for clean highlighting
+                output.innerHTML = '';
+                const newCode = document.createElement('code');
+                newCode.className = 'hljs';
+                newCode.id = 'Scroll';
+                newCode.textContent = code;
+                output.appendChild(newCode);
+                hljs.highlightElement(newCode);
+                // Save the code to localStorage
+                localStorage.setItem('savedCode', code);
+            }
+
+            // Reset the textarea and remove the code from localStorage
+            function resetCode() {
+                document.getElementById('codeInput').value = '';
+                document.getElementById('outputCode').innerHTML = '<code class="hljs"></code>';
+                localStorage.removeItem('savedCode'); // Remove code from localStorage
+            }
+
+            // Logout confirmation modal logic
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                    modal.show();
+                });
+            }
+            const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+            if (confirmLogoutBtn) {
+                confirmLogoutBtn.addEventListener('click', function() {
+                    fetch('DB_Connection.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'logout=1'
+                    })
+                    .then(res => res.json())
+                    .then(json => {
+                        window.location.href = 'index.html';
+                    });
+                });
+            }
+        </script>
+    </div>
+</body>
+
+</html>

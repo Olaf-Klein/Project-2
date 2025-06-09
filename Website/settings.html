@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Instellingen - BitBin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <script type="text/javascript" src="whitemode.js" defer></script>
+    <style>
+        body {
+            background: var(--background-gradient, radial-gradient(circle, #755764 0%, #112e4f 100%));
+            color: var(--whitetext-color, #f8f8f8);
+        }
+        .whitemode {
+            --background-gradient: radial-gradient(circle, #d4b8c5 0%, #a1bcd6 100%);
+            --whitetext-color: #000;
+        }
+        .card {
+            background: rgba(34, 34, 34, 0.85);
+            border-radius: 16px;
+            box-shadow: 0 2px 16px #0002;
+        }
+        .whitemode .card {
+            background: #f8f8f8;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+        .nav-pills .nav-link {
+            color: #0d6efd;
+            border-radius: 8px;
+        }
+        .whitemode .nav-pills .nav-link.active {
+            background-color: #a1bcd6;
+            color: #000;
+        }
+        .whitemode .nav-pills .nav-link {
+            color: #0d6efd;
+        }
+        .theme-text {
+            color: #fff;
+        }
+        .whitemode .theme-text {
+            color: #000;
+        }
+        /* Ensure h5 and label colors adapt to theme */
+        h5, label.form-label {
+            color: #fff;
+        }
+        .whitemode h5, .whitemode label.form-label {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5 text-light">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card p-4">
+                    <h2 class="mb-4 text-primary text-center">Instellingen</h2>
+                    <div class="row">
+                        <div class="col-4">
+                            <ul class="nav nav-pills flex-column mb-4" id="settingsTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab">Account</button>
+                                </li>
+                                <!-- <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="theme-tab" data-bs-toggle="tab" data-bs-target="#theme" type="button" role="tab">Thema</button>
+                                </li> -->
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="billing-tab" data-bs-toggle="tab" data-bs-target="#billing" type="button" role="tab">Abonnement</button>
+                                </li>
+                                <li class="nav-item mt-auto" role="presentation" style="position:absolute;bottom:0;left:0;width:85%;">
+                                    <button class="nav-link d-flex align-items-center" id="home-tab" type="button" onclick="window.location.href='home.html'">
+                                        <i class="bi bi-house me-2"></i> Terug naar Home
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <div class="tab-content" id="settingsTabsContent">
+                                <!-- Account Tab -->
+                                <div class="tab-pane fade show active" id="account" role="tabpanel">
+                                    <h5 class="mb-3">Accountgegevens</h5>
+                                    <div class="mb-3">
+                                        <label class="form-label">Gebruikersnaam</label>
+                                        <input type="text" class="form-control" id="settingsUsername" value="Gebruiker" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">E-mail</label>
+                                        <input type="email" class="form-control" id="settingsEmail" value="email@example.com" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Wachtwoord</label>
+                                        <input type="password" class="form-control" value="wachtwoord" readonly>
+                                    </div>
+                                    <button class="btn btn-outline-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#changePasswordCollapse">Wachtwoord wijzigen</button>
+                                    <div class="collapse" id="changePasswordCollapse">
+                                        <form id="changePasswordForm">
+                                            <div class="mb-2">
+                                                <input type="password" class="form-control" id="oldPassword" placeholder="Huidig wachtwoord" required>
+                                            </div>
+                                            <div class="mb-2">
+                                                <input type="password" class="form-control" id="newPassword" placeholder="Nieuw wachtwoord" required>
+                                            </div>
+                                            <div class="mb-2">
+                                                <input type="password" class="form-control" id="confirmNewPassword" placeholder="Bevestig nieuw wachtwoord" required>
+                                            </div>
+                                            <div id="changePasswordMsg" class="mb-2 text-center"></div>
+                                            <button type="submit" class="btn btn-primary w-100">Wijzigen</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- Theme Tab -->
+                                <div class="tab-pane fade" id="theme" role="tabpanel">
+                                    <h5 class="mb-3">Thema</h5>
+                                    <button class="btn btn-secondary w-100" id="theme-switch">Wissel thema</button>
+                                </div>
+                                <!-- Billing Tab (future) -->
+                                <div class="tab-pane fade" id="billing" role="tabpanel">
+                                    <h5 class="mb-3">Abonnement</h5>
+                                    <div class="alert alert-info">Beheer je abonnement en facturatie hier (binnenkort beschikbaar).</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="whitemode.js"></script>
+    <script>
+        // Fetch and display real user data
+        fetch('DB_Connection.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'get_user_info=1'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('settingsUsername').value = data.username;
+                document.getElementById('settingsEmail').value = data.email;
+            }
+        });
+
+        // Change password AJAX
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const msg = document.getElementById('changePasswordMsg');
+            msg.textContent = '';
+            const data = new URLSearchParams();
+            data.append('change_password', 1);
+            data.append('old_password', document.getElementById('oldPassword').value);
+            data.append('new_password', document.getElementById('newPassword').value);
+            data.append('confirm_new_password', document.getElementById('confirmNewPassword').value);
+            fetch('DB_Connection.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: data.toString()
+            })
+            .then(res => res.json())
+            .then(json => {
+                msg.textContent = json.message;
+                msg.style.color = json.success ? 'green' : 'red';
+                if (json.success) {
+                    document.getElementById('changePasswordForm').reset();
+                }
+            })
+            .catch(() => {
+                msg.textContent = 'Er is een fout opgetreden.';
+                msg.style.color = 'red';
+            });
+        });
+
+        // Logout confirmation modal logic
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                modal.show();
+            });
+        }
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        if (confirmLogoutBtn) {
+            confirmLogoutBtn.addEventListener('click', function() {
+                fetch('DB_Connection.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'logout=1'
+                })
+                .then(res => res.json())
+                .then(json => {
+                    window.location.href = 'index.html';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
